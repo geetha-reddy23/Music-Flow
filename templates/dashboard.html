@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Music Flow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Google Font: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+</head>
+
+<body>
+    <!-- Background Elements -->
+    <div class="bg-gradient"></div>
+    <div class="particles" id="particles"></div>
+
+    <header>
+        <h1>Music Flow</h1>
+        <nav>
+            <span style="color: var(--text-dim); font-size: 0.9rem;">Hi, {{ session['username'] }}</span>
+            <a href="{{ url_for('logout') }}" class="nav-btn-glow" style="margin-left: 15px;">Logout</a>
+        </nav>
+    </header>
+
+    <div class="main-container">
+
+        <!-- TAB NAVIGATION -->
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="openTab(event, 'for_you')">
+                <i class="fas fa-sparkles"></i> For You
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'recently_played')">
+                <i class="fas fa-history"></i> Recently Played
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'explore')">
+                <i class="fas fa-compass"></i> Explore All
+            </button>
+        </div>
+
+        <!-- 1. FOR YOU TAB -->
+        <div id="for_you" class="tab-content active">
+            <div class="music-section">
+                <h2><i class="fas fa-magic" style="color: var(--accent);"></i> Tailored for You</h2>
+                <div class="music-grid">
+                    {% for song in recommendations %}
+                    <div class="song-card reveal">
+                        <div class="card-img-container">
+                            <img src="{{ song.image_url if song.image_url else url_for('static', filename='images/default_album.jpg') }}"
+                                alt="{{ song.title }}" class="card-img"
+                                onerror="this.src='https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=500&auto=format&fit=crop'">
+                            <div class="card-overlay">
+                                <div class="equalizer" id="equalizer-{{ song.song_id }}">
+                                    <div class="eq-bar"></div>
+                                    <div class="eq-bar"></div>
+                                    <div class="eq-bar"></div>
+                                </div>
+                            </div>
+                            <div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                                <i class="far fa-heart like-icon" onclick="toggleLike(this)"
+                                    style="background: rgba(0,0,0,0.5); padding: 8px; border-radius: 50%; backdrop-filter: blur(5px);"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <h3>{{ song.title }}</h3>
+                            <p>{{ song.artist }}</p>
+                            <div class="badge-group">
+                                <span class="badge badge-genre">{{ song.genre }}</span>
+                                <span class="badge badge-mood">{{ song.mood }}</span>
+                            </div>
+                            <div class="card-actions">
+                                <a href="#" class="btn-play-card" id="btn-{{ song.song_id }}"
+                                    onclick="return playMusic('{{ song.song_id }}', '{{ song.file_path }}', '{{ song.title }}')">
+                                    <i class="fas fa-play"></i> Play Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. RECENTLY PLAYED TAB -->
+        <div id="recently_played" class="tab-content">
+            <div class="music-section">
+                <h2><i class="fas fa-history" style="color: var(--accent);"></i> Your Recent Vibes
+                </h2>
+                {% if recent %}
+                <div class="music-grid">
+                    {% for song in recent %}
+                    <div class="song-card">
+                        <div class="card-img-container">
+                            <img src="{{ song.image_url }}" alt="{{ song.title }}" class="card-img">
+                            <div style="position: absolute; top: 10px; right: 10px;">
+                                <i class="far fa-heart like-icon" onclick="toggleLike(this)"
+                                    style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 50%; backdrop-filter: blur(5px);"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <h3>{{ song.title }}</h3>
+                            <p>{{ song.artist }}</p>
+                            <div class="badge-group">
+                                <span class="badge badge-genre">{{ song.genre }}</span>
+                                <span class="badge badge-mood">{{ song.mood }}</span>
+                            </div>
+                            <div class="card-actions">
+                                <a href="#" class="btn-play-card"
+                                    onclick="return playMusic('{{ song.song_id }}', '{{ song.file_path }}', '{{ song.title }}')">
+                                    <i class="fas fa-play"></i> Play Again
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div
+                    style="text-align: center; background: var(--bg-card); padding: 3rem; border-radius: 20px; border: 1px dashed var(--glass-border);">
+                    <i class="fas fa-clock-rotate-left" style="font-size: 2rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                    <p style="color: var(--text-dim);">No listening history yet. Start playing some music!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 3. EXPLORE ALL TAB -->
+        <div id="explore" class="tab-content">
+            <!-- SEARCH AND FILTERS -->
+            <div class="filter-bar">
+                <form action="{{ url_for('dashboard') }}" method="GET" style="display: flex; gap: 15px; width: 100%;">
+                    <input type="text" name="search" class="search-input" placeholder="Search tracks, artists..."
+                        value="{{ search_query }}" style="flex: 2;">
+
+                    <select name="genre" class="select-filter">
+                        <option value="All">All Genres</option>
+                        {% for genre in genres %}
+                        <option value="{{ genre }}" {% if selected_genre==genre %}selected{% endif %}>{{ genre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="mood" class="select-filter">
+                        <option value="All">All Moods</option>
+                        {% for mood in moods %}
+                        <option value="{{ mood }}" {% if selected_mood==mood %}selected{% endif %}>{{ mood }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit" class="btn-filter">Apply</button>
+                </form>
+            </div>
+
+            <div class="music-section">
+
+                {% if songs %}
+                <div class="music-grid">
+                    {% for song in songs %}
+                    <div class="song-card">
+                        <div class="card-img-container">
+                            <img src="{{ song.image_url }}" alt="{{ song.title }}" class="card-img">
+                            <div style="position: absolute; top: 10px; right: 10px;">
+                                <i class="far fa-heart like-icon" onclick="toggleLike(this)"
+                                    style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 50%; backdrop-filter: blur(5px);"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <h3>{{ song.title }}</h3>
+                            <p>{{ song.artist }}</p>
+                            <div class="badge-group">
+                                <span class="badge badge-genre">{{ song.genre }}</span>
+                                <span class="badge badge-mood">{{ song.mood }}</span>
+                            </div>
+                            <div class="card-actions">
+                                <a href="#" class="btn-play-card"
+                                    onclick="return playMusic('{{ song.song_id }}', '{{ song.file_path }}', '{{ song.title }}')">
+                                    <i class="fas fa-play"></i> Play
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div
+                    style="text-align: center; background: var(--bg-card); padding: 4rem; border-radius: 20px; border: 1px dashed var(--glass-border);">
+                    <i class="fas fa-search" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                    <p style="color: var(--text-dim);">No songs found matching your vibe.</p>
+                    <a href="{{ url_for('dashboard') }}"
+                        style="color: var(--primary); font-weight: bold; text-decoration: none; margin-top: 10px; display: inline-block;">Clear
+                        all filters</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- STICKY PLAYER BAR -->
+        <div id="player-container" style="display: none;">
+            <div style="display: flex; align-items: center; width: 100%; gap: 30px;">
+                <div style="flex: 1; display: flex; align-items: center; gap: 15px;">
+                    <div class="visualizer" style="height: 20px; margin: 0;">
+                        <div class="bar"
+                            style="width: 2px; animation-duration: 1.5s; background: var(--primary); opacity: 0.5;">
+                        </div>
+                        <div class="bar"
+                            style="width: 2px; animation-duration: 2s; background: var(--secondary); opacity: 0.5;">
+                        </div>
+                        <div class="bar"
+                            style="width: 2px; animation-duration: 1.8s; background: var(--text-dim); opacity: 0.3;">
+                        </div>
+                    </div>
+                    <div style="min-width: 0;">
+                        <div id="now-playing"
+                            style="font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            Now Playing...</div>
+                        <div style="font-size: 0.8rem; color: var(--text-dim);">Music Flow AI Stream</div>
+                    </div>
+                </div>
+
+                <div style="flex: 2;">
+                    <audio id="audio-player" controls autoplay>
+                        <source id="audio-source" src="" type="audio/mpeg">
+                    </audio>
+                </div>
+
+                <div style="flex: 1; text-align: right; display: flex; justify-content: flex-end; gap: 15px;">
+                    <i class="fas fa-list" style="opacity: 0.6; cursor: pointer;"></i>
+                    <i class="fas fa-volume-up" style="opacity: 0.6; cursor: pointer;"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Tab switching logic
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+
+            // Remember tab in session storage
+            sessionStorage.setItem('activeTab', tabName);
+        }
+
+        // Restore active tab on load
+        window.onload = function () {
+            const activeTab = sessionStorage.getItem('activeTab');
+            if (activeTab) {
+                const tabBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.getAttribute('onclick').includes(activeTab));
+                if (tabBtn) {
+                    tabBtn.click();
+                }
+            }
+        };
+
+        // Improved Particle Generator
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 45;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = Math.random() * 4 + 2 + 'px';
+            particle.style.width = size;
+            particle.style.height = size;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = (Math.random() * 100 + 100) + '%';
+            particle.style.background = 'var(--primary)';
+            particle.style.opacity = '0.5';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        // Reveal on scroll (simplified)
+        const reveal = () => {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const elementTop = el.getBoundingClientRect().top;
+                if (elementTop < windowHeight - 50) {
+                    el.classList.add('active');
+                }
+            });
+        };
+        window.addEventListener('scroll', reveal);
+        window.addEventListener('load', reveal);
+
+        let currentSongId = null;
+
+        function playMusic(songId, filePath, title) {
+            const player = document.getElementById('audio-player');
+            const source = document.getElementById('audio-source');
+            const container = document.getElementById('player-container');
+            const nowPlaying = document.getElementById('now-playing');
+
+            // Reset previous equalizer if any
+            if (currentSongId) {
+                const prevEq = document.getElementById('equalizer-' + currentSongId);
+                if (prevEq) prevEq.classList.remove('active');
+            }
+
+            currentSongId = songId;
+
+            // Show active equalizer on card
+            const activeEq = document.getElementById('equalizer-' + songId);
+            if (activeEq) activeEq.classList.add('active');
+
+            fetch('/play/' + songId)
+                .then(response => console.log("History logged"))
+                .catch(err => console.error("Could not log history"));
+
+            const url = "/static/songs/" + filePath;
+            source.src = url;
+            player.load();
+            player.play();
+
+            container.style.display = 'block';
+            nowPlaying.innerText = title;
+
+            return false;
+        }
+
+        function toggleLike(element) {
+            element.classList.toggle('fas');
+            element.classList.toggle('far');
+            element.classList.toggle('active');
+            if (element.classList.contains('fas')) {
+                element.style.color = 'var(--primary)';
+            } else {
+                element.style.color = 'rgba(255, 255, 255, 0.5)';
+            }
+        }
+    </script>
+</body>
+
+</html>

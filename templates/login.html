@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Music Flow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="particles" id="particles"></div>
+
+    <header>
+        <h1><a href="{{ url_for('index') }}" style="color: inherit; text-decoration: none;">Music Flow</a></h1>
+        <nav>
+            <a href="{{ url_for('register') }}">Register</a>
+        </nav>
+    </header>
+
+    <div class="auth-container">
+        <h2>Welcome Back</h2>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('login') }}" method="POST" class="auth-form">
+            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; opacity: 0.8;">Email Address</label>
+            <input type="email" name="email" required placeholder="name@example.com">
+
+            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; opacity: 0.8;">Password</label>
+            <input type="password" name="password" required placeholder="••••••••">
+
+            <button type="submit">Login to Flow</button>
+        </form>
+        <p style="margin-top: 25px; text-align: center; font-size: 0.9rem; opacity: 0.7;">New to Music Flow? <a
+                href="{{ url_for('register') }}"
+                style="color: var(--primary); font-weight: 600; text-decoration: none;">Create an account</a></p>
+    </div>
+
+    <script>
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 30;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = Math.random() * 4 + 2 + 'px';
+            particle.style.width = size;
+            particle.style.height = size;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = (Math.random() * 100 + 100) + '%';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+            particlesContainer.appendChild(particle);
+        }
+    </script>
+</body>
+
+</html>
