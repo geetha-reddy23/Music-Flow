@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>User Flow Diagram</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #1e293b;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 50px;
+            color: #0f172a;
+        }
+
+        /* EXACT Container for the diagram layout */
+        .diagram-container {
+            display: grid;
+            grid-template-columns: 180px 220px 200px 220px;
+            grid-template-rows: 80px 80px 80px 80px 80px 80px;
+            gap: 24px 60px;
+            width: 1040px;
+            position: relative;
+        }
+
+        /* Modern Box Style */
+        .box {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            font-size: 13px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 2;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 2px solid transparent;
+            /* Allows border coloring */
+        }
+
+        .box strong {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 5px;
+            font-size: 15px;
+            color: #0f172a;
+        }
+
+        .box-icon {
+            font-size: 24px;
+        }
+
+        .desc-text {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* -- Box Specific Coloring -- */
+        .landing {
+            border-color: #38bdf8;
+            grid-column: 1;
+            grid-row: 2 / span 4;
+            justify-content: center;
+        }
+
+        /* Light blue */
+        .register {
+            border-color: #10b981;
+            grid-column: 2;
+            grid-row: 2 / span 2;
+            justify-content: flex-start;
+        }
+
+        /* Green */
+        .login {
+            border-color: #a855f7;
+            grid-column: 2;
+            grid-row: 4 / span 2;
+            justify-content: flex-start;
+            margin-top: 15px;
+            /* Added to push it down from Register box */
+        }
+
+        /* Purple */
+        .dashboard {
+            border-color: #f59e0b;
+            grid-column: 3;
+            grid-row: 2 / span 4;
+            justify-content: center;
+            align-self: center;
+            height: 340px;
+        }
+
+        /* Orange */
+
+        .logout {
+            border-color: #ef4444;
+            /* Red */
+            color: #0f172a;
+            font-weight: bold;
+            font-size: 15px;
+            grid-column: 4;
+            grid-row: 1;
+            width: 120px;
+            justify-self: end;
+            align-self: end;
+            height: 60px;
+        }
+
+        .feature-music {
+            grid-column: 4;
+            grid-row: 2;
+        }
+
+        .feature-search {
+            grid-column: 4;
+            grid-row: 3;
+        }
+
+        .feature-recs {
+            grid-column: 4;
+            grid-row: 4;
+        }
+
+        .feature-history {
+            grid-column: 4;
+            grid-row: 5;
+        }
+
+        .feature-music,
+        .feature-search,
+        .feature-recs,
+        .feature-history {
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .player-bar {
+            grid-column: 1 / span 4;
+            grid-row: 6;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background-color: #0f172a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            align-self: center;
+            height: 60px;
+        }
+
+        .player-bar strong {
+            color: white;
+            display: inline-flex;
+            flex-direction: row;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .player-bar .controls {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+
+        .player-bar .controls span {
+            cursor: pointer;
+        }
+
+        /* Form styling inside auth boxes */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 0 10px;
+        }
+
+        .auth-input {
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #64748b;
+            text-align: left;
+        }
+
+        .auth-btn {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            align-self: center;
+            margin-top: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* -- SVG Overlays -- */
+        .svg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1040px;
+            height: 750px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .svg-overlay path {
+            fill: none;
+            stroke: #94a3b8;
+            /* Subtle blue/gray lines matching original */
+            stroke-width: 2px;
+            stroke-linecap: round;
+        }
+
+        .svg-overlay polygon {
+            fill: #94a3b8;
+        }
+
+        .line-label {
+            position: absolute;
+            background: #ffffff;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            border-radius: 12px;
+            z-index: 3;
+            box-shadow: 0 0 0 2px #ffffff;
+            /* clear background around text */
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 class="title">Music Flow</h1>
+
+    <div class="diagram-container">
+
+        <!-- SVG Path Lines -->
+        <svg class="svg-overlay">
+            <!-- Landing to Register (New User) -->
+            <path d="M 180 184 L 240 184" />
+            <polygon points="240,184 232,179 232,189" />
+
+            <!-- Landing to Login (Returning User) -->
+            <path d="M 180 431 L 240 431" />
+            <polygon points="240,431 232,426 232,436" />
+
+            <!-- Register to Login (Redirect to Login) -->
+            <path d="M 350 288 L 350 330" />
+            <polygon points="350,336 345,328 355,328" />
+
+            <!-- Login to Dashboard (Go to Dashboard) -->
+            <path d="M 460 431 L 520 431" />
+            <polygon points="520,431 512,426 512,436" />
+
+            <!-- Dashboard to Features (Browse, Find, Personalized, History) -->
+            <path d="M 720 144 L 780 144" />
+            <polygon points="780,144 772,139 772,149" />
+            <path d="M 720 248 L 780 248" />
+            <polygon points="780,248 772,243 772,253" />
+            <path d="M 720 352 L 780 352" />
+            <polygon points="780,352 772,347 772,357" />
+            <path d="M 720 456 L 780 456" />
+            <polygon points="780,456 772,451 772,461" />
+
+            <!-- Dashboard to Logout -->
+            <path d="M 620 130 L 620 50 L 880 50" />
+            <polygon points="880,50 872,45 872,55" />
+
+            <!-- Logout to Landing (Redirect) -->
+            <path d="M 940 20 L 940 10 L 90 10 L 90 104" />
+            <polygon points="90,104 85,96 95,96" />
+        </svg>
+
+        <!-- Path Labels positioned identically to original drawing -->
+        <div class="line-label" style="top: 176px; left: 165px;">New User</div>
+        <div class="line-label" style="top: 423px; left: 155px;">Returning User</div>
+        <div class="line-label" style="top: 304px; left: 285px;">Redirect to Login</div>
+        <div class="line-label"
+            style="top: 425px; left: 432px; font-size: 10px; transform: rotate(-90deg); margin-left: -32px; margin-top: -12px; background: transparent;">
+            Go to Dashboard</div>
+
+        <div class="line-label" style="top: 136px; left: 725px;">Browse</div>
+        <div class="line-label" style="top: 240px; left: 735px;">Find</div>
+        <div class="line-label" style="top: 344px; left: 710px;">Personalized</div>
+        <div class="line-label" style="top: 448px; left: 728px;">History</div>
+
+        <div class="line-label" style="top: 42px; left: 740px;">Logout</div>
+        <div class="line-label" style="top: 2px; left: 500px;">Redirect</div>
+
+        <!-- UI Components -->
+        <div class="box landing">
+            <strong><span class="box-icon">🏠</span> Landing Page</strong>
+            <span class="desc-text">index.html</span>
+        </div>
+
+        <div class="box register">
+            <strong>Register Page</strong>
+            <span class="desc-text">register.html</span>
+            <div class="auth-form">
+                <div class="auth-input">Username</div>
+                <div class="auth-input">Email</div>
+                <div class="auth-input">Password</div>
+                <div class="auth-btn">Submit ➞</div>
+            </div>
+        </div>
+
+        <div class="box login">
+            <strong>Login Page</strong>
+            <span class="desc-text">login.html</span>
+            <div class="auth-form">
+                <div class="auth-input">Email</div>
+                <div class="auth-input">Password</div>
+                <div class="auth-btn">Submit ➞</div>
+            </div>
+        </div>
+
+        <div class="box dashboard">
+            <strong>Dashboard</strong>
+            <span class="desc-text">dashboard.html</span>
+        </div>
+
+        <div class="logout box">
+            <strong>Logout</strong>
+        </div>
+
+        <div class="box feature-music">
+            <strong>Music Catalog</strong>
+            <span class="desc-text">Shows song cards grid</span>
+        </div>
+
+        <div class="box feature-search">
+            <strong>Search &amp; Filter</strong>
+            <span class="desc-text">Filters by Genre + Mood</span>
+        </div>
+
+        <div class="box feature-recs">
+            <strong>Recommended For You</strong>
+            <span class="desc-text">AI picks based on history</span>
+        </div>
+
+        <div class="box feature-history">
+            <strong>Recently Played</strong>
+            <span class="desc-text">Listening history</span>
+        </div>
+
+        <div class="player-bar">
+            <strong>&#9658; Play/Pause &nbsp;&nbsp;|&nbsp;&nbsp; Song Name, Artist</strong>
+            <span class="desc-text"
+                style="position:absolute; bottom:-25px; left:48%; font-weight:normal; color:#64748b;">Sticky Player
+                Bar</span>
+            <div class="controls">
+                <span>Previous</span>
+                <span>Next</span>
+                <span>Volume</span>
+                <span>Shuffle</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

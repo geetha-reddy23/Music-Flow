@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Music Flow – Architecture Diagram</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #ffffff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 32px;
+            color: #1e293b;
+        }
+
+        h1 {
+            color: #0f172a;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 56px;
+            text-align: center;
+        }
+
+        /* ── Diagram Layout ── */
+        .diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .layer {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 32px 24px 24px 24px;
+            width: 100%;
+            position: relative;
+            box-shadow: inset 0 0 0 1px #e2e8f0, 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        .layer-title-wrapper {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffffff;
+            padding: 4px 16px;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), 0 0 0 1px #cbd5e1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .layer-sub {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .layer-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        /* ── Cards grid inside layers ── */
+        .card-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+            min-width: 150px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 1px 3px -1px rgba(0, 0, 0, 0.03);
+            border: 2px solid transparent;
+            /* reserved for colored borders */
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Specific layer borders */
+        .layer.frontend .card {
+            border-color: #38bdf8;
+        }
+
+        /* Light Blue */
+        .layer.backend .card {
+            border-color: #10b981;
+        }
+
+        /* Emerald Green */
+        .layer.database .card {
+            border-color: #8b5cf6;
+        }
+
+        /* Purple */
+
+        .card-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Database special styling */
+        .db-card {
+            text-align: left;
+            min-width: 200px;
+        }
+
+        .db-card .card-title {
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .db-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 12px;
+            font-size: 12px;
+            color: #475569;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+        }
+
+        /* ── Connectors ── */
+        .connector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            height: 50px;
+        }
+
+        .connector-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Music Flow - AI-Driven Music Streaming App</h1>
+    <p class="subtitle">System Architecture Diagram</p>
+
+    <div class="diagram">
+
+        <!-- TOP LAYER: FRONTEND -->
+        <div class="layer frontend">
+            <div class="layer-title-wrapper">
+                <span class="layer-sub">Top Layer</span>
+                <span class="layer-title">Frontend (HTML/CSS)</span>
+            </div>
+
+            <div class="card-grid">
+                <div class="card">
+                    <span class="card-icon">🏠</span>
+                    <div class="card-title">index.html</div>
+                    <div class="card-desc">(Landing Page)</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">👤</span>
+                    <div class="card-title">register.html</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🔐</span>
+                    <div class="card-title">login.html</div>
+                </div>
+                <div class="card" style="min-width: 250px;">
+                    <span class="card-icon">🎵 ⚙️ 💡</span>
+                    <div class="card-title">dashboard.html</div>
+                    <div class="card-desc">(Music Player + Filters + Recommendations)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONNECTOR 1 -->
+        <div class="connector">
+            <svg width="24" height="50" xmlns="http://www.w3.org/2000/svg">
+                <line x1="12" y1="0" x2="12" y2="40" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" />
+                <polygon points="6,35 18,35 12,46" fill="#94a3b8" />
+            </svg>
+            <span class="connector-label">HTTP Request/Response</span>
+        </div>
+
+        <!-- MIDDLE LAYER: BACKEND -->
+        <div class="layer backend">
+            <div class="layer-title-wrapper">
+                <span class="layer-sub">Middle Layer</span>
+                <span class="layer-title">Backend (Python Flask)</span>
+            </div>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-title">/</div>
+                    <div class="card-desc">Home Route</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">/register</div>
+                    <div class="card-desc">User Registration</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">/login</div>
+                    <div class="card-desc">Authentication</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">/dashboard</div>
+                    <div class="card-desc">Music Catalog<br>+ AI Recs + Search/Filter</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">/play/&lt;id&gt;</div>
+                    <div class="card-desc">Playback Logger</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONNECTOR 2 -->
+        <div class="connector">
+            <svg width="24" height="50" xmlns="http://www.w3.org/2000/svg">
+                <line x1="12" y1="0" x2="12" y2="40" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" />
+                <polygon points="6,35 18,35 12,46" fill="#94a3b8" />
+            </svg>
+            <span class="connector-label">SQL Queries / Results</span>
+        </div>
+
+        <!-- BOTTOM LAYER: DATABASE -->
+        <div class="layer database">
+            <div class="layer-title-wrapper">
+                <span class="layer-sub">Bottom Layer</span>
+                <span class="layer-title">Database (MySQL)</span>
+            </div>
+
+            <div class="card-grid">
+                <div class="card db-card">
+                    <div class="card-title">🗄️ users</div>
+                    <div class="db-cols">
+                        <span>user_id</span>
+                        <span>email</span>
+                        <span>username</span>
+                        <span>password</span>
+                    </div>
+                </div>
+                <div class="card db-card">
+                    <div class="card-title">🗄️ songs</div>
+                    <div class="db-cols">
+                        <span>song_id</span>
+                        <span>genre</span>
+                        <span>title</span>
+                        <span>file_path</span>
+                        <span>artist</span>
+                        <span>mood</span>
+                    </div>
+                </div>
+                <div class="card db-card">
+                    <div class="card-title">🗄️ listening_history</div>
+                    <div class="db-cols">
+                        <span>history_id</span>
+                        <span>song_id</span>
+                        <span>user_id</span>
+                        <span>played_at</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

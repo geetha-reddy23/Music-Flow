@@ -17,7 +17,7 @@ Music-Flow/
   │   ├── style.css       # CSS Styling
   │   └── songs/          # Folder for Audio (.mp3) Files
   ├── documentation/      # Project Documentation
-  │   ├── er_diagram.html           # Database Entity-Relationship      Diagram
+  │   ├── er_diagram.html           # Database Entity-Relationship Diagram
   │   └── SEMINAR_PRESENTATION.md   # Presentation content for the project
   └── README.md           # Setup Instructions
 ```
@@ -34,7 +34,7 @@ pip install flask mysql-connector-python
 You can run the provided `database.sql` script in your MySQL Command Line or terminal using this command:
 
 ```bash
-cd path to /Music-Flow
+cd Music-Flow
 ```
 
 ```bash
