@@ -51,7 +51,7 @@ Open `app.py` and update your MySQL credentials:
 def get_db_connection():
     return mysql.connector.connect(
         host="localhost",
-        user="root",        # Your MySQL username
+        user="root",        
         password="your_password",  # Your MySQL password
         database="music_flow"
     )

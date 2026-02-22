@@ -123,7 +123,9 @@ def dashboard():
     recent_history = cursor.fetchall()
     
     # --- 3. SMART RECOMMENDATION LOGIC ---
-    # Find user's most played genre
+    recommendations = []
+    
+    # 3.1 Find user's top genres (up to 2)
     cursor.execute("""
         SELECT s.genre, COUNT(lh.history_id) as count 
         FROM listening_history lh 
@@ -131,22 +133,55 @@ def dashboard():
         WHERE lh.user_id = %s 
         GROUP BY s.genre 
         ORDER BY count DESC 
+        LIMIT 2
+    """, (user_id,))
+    top_genres = cursor.fetchall()
+    
+    # 3.2 Find user's top mood (1)
+    cursor.execute("""
+        SELECT s.mood, COUNT(lh.history_id) as count 
+        FROM listening_history lh 
+        JOIN songs s ON lh.song_id = s.song_id 
+        WHERE lh.user_id = %s 
+        GROUP BY s.mood 
+        ORDER BY count DESC 
         LIMIT 1
     """, (user_id,))
-    favorite_genre_data = cursor.fetchone()
+    top_mood = cursor.fetchone()
+
+    # 3.3 Collect candidate recommendations
+    seen_song_ids = set()
     
-    recommendations = []
-    if favorite_genre_data:
-        fav_genre = favorite_genre_data['genre']
-        # Recommend top 5 songs from favorite genre
-        rec_query = "SELECT * FROM songs WHERE genre = %s ORDER BY RAND() LIMIT 5"
-        cursor.execute(rec_query, (fav_genre,))
-        recommendations = cursor.fetchall()
-    
-    # Fallback: If no favorite genre or no recommendations, show random 5 songs
-    if not recommendations:
-        cursor.execute("SELECT * FROM songs ORDER BY RAND() LIMIT 5")
-        recommendations = cursor.fetchall()
+    # Add songs from top genres
+    for g_data in top_genres:
+        cursor.execute("SELECT * FROM songs WHERE genre = %s ORDER BY RAND() LIMIT 2", (g_data['genre'],))
+        for s in cursor.fetchall():
+            if s['song_id'] not in seen_song_ids:
+                recommendations.append(s)
+                seen_song_ids.add(s['song_id'])
+                
+    # Add songs from top mood
+    if top_mood:
+        cursor.execute("SELECT * FROM songs WHERE mood = %s ORDER BY RAND() LIMIT 2", (top_mood['mood'],))
+        for s in cursor.fetchall():
+            if s['song_id'] not in seen_song_ids:
+                recommendations.append(s)
+                seen_song_ids.add(s['song_id'])
+
+    # 3.4 Fallback/Padding: Ensure we have at least 6 diverse recommendations
+    while len(recommendations) < 6:
+        cursor.execute("SELECT * FROM songs ORDER BY RAND() LIMIT 1")
+        s = cursor.fetchone()
+        if s and s['song_id'] not in seen_song_ids:
+            recommendations.append(s)
+            seen_song_ids.add(s['song_id'])
+        elif not s: # Should not happen if DB has songs
+            break
+            
+    # Shuffle finally for a fresh feel
+    import random
+    random.shuffle(recommendations)
+    recommendations = recommendations[:6]
 
     cursor.close()
     db.close()
