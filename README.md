@@ -7,6 +7,7 @@ A simple, beginner-friendly web application built with Python Flask, MySQL, and 
 Music-Flow/
   ├── app.py              # Main Flask Backend
   ├── database.sql        # SQL Database Setup Script
+  ├── update_images.sql   # SQL Script to update song cover images
   ├── templates/          # HTML Templates
   │   ├── index.html
   │   ├── register.html
@@ -15,6 +16,9 @@ Music-Flow/
   ├── static/             # Static Assets
   │   ├── style.css       # CSS Styling
   │   └── songs/          # Folder for Audio (.mp3) Files
+  ├── documentation/      # Project Documentation
+  │   ├── er_diagram.html           # Database Entity-Relationship      Diagram
+  │   └── SEMINAR_PRESENTATION.md   # Presentation content for the project
   └── README.md           # Setup Instructions
 ```
 
@@ -39,7 +43,9 @@ cd path to /Music-Flow
 
 (Replace `root` with your username if it's different. You will be prompted for your password.)
 
-Alternatively, you can run the following commands manually in your MySQL Workbench or Shell from database.sql file
+Alternatively, you can run the following commands manually in your MySQL Workbench or Shell from database.sql file.
+
+*Optional: To update your database with cover images for the songs, you can also run the `update_images.sql` script.*
 
 ### 3. Prepare Audio Files
 1.  Go to the `static/songs/` folder.
