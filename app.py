@@ -13,6 +13,7 @@ def get_db_connection():
             user=os.getenv("DB_USER", "root"),
             password=os.getenv("DB_PASSWORD", "bavi1501"),
             database=os.getenv("DB_NAME", "music_flow"),
+            port=int(os.getenv("DB_PORT", 3306)),
             connect_timeout=10
         )
         return conn
