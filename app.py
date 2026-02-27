@@ -21,7 +21,7 @@ def get_db_connection():
             password=os.getenv("DB_PASSWORD", "bavi1501"),
             database=os.getenv("DB_NAME", "music_flow"),
             connect_timeout=15,
-            ssl_mode='REQUIRED'
+            ssl_disabled=False  # Use more compatible SSL argument
         )
         return conn
     except Exception as e:
