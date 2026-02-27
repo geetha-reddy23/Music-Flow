@@ -53,7 +53,7 @@ def register():
         try:
             db = get_db_connection()
             if not db:
-                flash("Unable to connect to the database. Please check connection settings.")
+                flash(f"Database connection failed: {last_db_error}")
                 return redirect(url_for('register'))
             cursor = db.cursor()
             
@@ -87,7 +87,7 @@ def login():
         
         db = get_db_connection()
         if not db:
-            flash("Unable to connect to the database. Please check connection settings.")
+            flash(f"Database connection failed: {last_db_error}")
             return redirect(url_for('login'))
         cursor = db.cursor(dictionary=True) # dictionary=True makes results easier to handle
         
