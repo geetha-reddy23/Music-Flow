@@ -8,10 +8,10 @@ app.secret_key = 'supersecretkey'  # Change this for production
 # --- DATABASE CONNECTION ---
 def get_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",        # Your MySQL username
-        password="bavi1501",      # Your MySQL password
-        database="music_flow"
+        host=os.getenv("DB_HOST", "localhost"),
+        user=os.getenv("DB_USER", "root"),
+        password=os.getenv("DB_PASSWORD", "bavi1501"),
+        database=os.getenv("DB_NAME", "music_flow")
     )
 
 # --- ROUTES ---

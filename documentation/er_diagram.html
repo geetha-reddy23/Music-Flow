@@ -3,406 +3,272 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Music Flow – ER Diagram</title>
+    <title>Music Flow – ER Diagram (Chen Notation)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            background: #ffffff;
             font-family: 'Inter', sans-serif;
-            min-height: 100vh;
+            background-color: #ffffff;
+            color: #1e293b;
+            margin: 0;
+            padding: 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 48px 32px;
-            color: #1e293b;
         }
 
-        h1 {
-            color: #1e293b;
-            font-size: 22px;
+        .title {
+            font-size: 28px;
             font-weight: 700;
-            margin-bottom: 6px;
-            text-align: center;
+            margin-bottom: 8px;
+            color: #0f172a;
         }
 
         .subtitle {
             color: #475569;
-            font-size: 13px;
-            margin-bottom: 48px;
-            text-align: center;
+            font-size: 14px;
+            margin-bottom: 40px;
         }
 
-        .subtitle code {
-            color: #2563eb;
-            font-weight: 600;
-        }
-
-        /* ── Diagram Layout ── */
-        .diagram {
-            display: flex;
-            align-items: center;
-            gap: 0;
-        }
-
-        /* ── Table Cards ── */
-        .table-card {
-            border: 1.5px solid #cbd5e1;
-            border-radius: 4px;
-            overflow: hidden;
-            min-width: 260px;
+        .diagram-container {
+            position: relative;
+            width: 1250px;
+            height: 750px;
             background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        .table-header {
-            padding: 10px 16px;
-            font-size: 14px;
-            font-weight: 700;
-            text-align: center;
-            color: #ffffff;
-            letter-spacing: 0.3px;
+        /* SVG layer for connecting lines */
+        .svg-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
         }
 
-        .users .table-header {
-            background: #1d4ed8;
+        .svg-lines line {
+            stroke: #94a3b8;
+            stroke-width: 1.5;
         }
 
-        .songs .table-header {
-            background: #047857;
-        }
-
-        .history .table-header {
-            background: #7c3aed;
-        }
-
-        /* Column header row */
-        .table-col-labels {
-            display: grid;
-            grid-template-columns: 36px 1fr 100px 90px;
-            padding: 5px 12px;
-            background: #f1f5f9;
-            border-top: 1.5px solid #cbd5e1;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #64748b;
-            letter-spacing: 0.5px;
-        }
-
-        .table-row {
-            display: grid;
-            grid-template-columns: 36px 1fr 100px 90px;
+        /* Shape Base */
+        .shape {
+            position: absolute;
+            display: flex;
             align-items: center;
-            padding: 7px 12px;
-            border-top: 1px solid #e2e8f0;
-            font-size: 12.5px;
-        }
-
-        .table-row:last-child {
-            border-bottom: none;
-        }
-
-        .row-icon {
+            justify-content: center;
+            text-align: center;
             font-size: 12px;
-            text-align: center;
-        }
-
-        .col-name {
             font-weight: 600;
-            color: #1e293b;
+            z-index: 2;
+            background: #ffffff;
+            transition: all 0.2s ease;
         }
 
-        .col-name.pk {
-            color: #b45309;
-        }
-
-        .col-name.fk {
-            color: #4338ca;
-        }
-
-        .col-type {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
-            color: #475569;
-        }
-
-        .col-note {
-            font-size: 10px;
-            color: #64748b;
-            text-align: right;
-            white-space: nowrap;
-        }
-
-        /* ── Connector ── */
-        .rel-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 0 24px;
-        }
-
-        .rel-badge {
-            padding: 6px 12px;
-            text-align: center;
-            background: transparent;
-        }
-
-        .rel-title {
-            font-size: 10px;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 5px;
-        }
-
-        .cardinality-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: #1e293b;
-            font-weight: 600;
-        }
-
-        .cardinality-row .line {
-            color: #94a3b8;
-            font-size: 14px;
-        }
-
-        .one {
-            color: #1d4ed8;
-            font-weight: 700;
-        }
-
-        .many {
-            color: #7c3aed;
-            font-weight: 700;
-        }
-
-        /* ── Legend ── */
-        .legend {
-            display: flex;
-            gap: 24px;
-            margin-top: 40px;
+        /* Entities: Rectangles (Strong Entity) */
+        .entity {
+            width: 150px;
+            height: 70px;
+            border: 2.5px solid #0f172a;
+            color: #0f172a;
             background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 4px;
-            padding: 10px 22px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Relationships: Diamonds */
+        .relationship {
+            width: 90px;
+            height: 90px;
+            border: 2px solid #38bdf8;
+            background: #f0f9ff;
+            transform: rotate(45deg);
+        }
+
+        .relationship span {
+            transform: rotate(-45deg);
+            display: block;
+            color: #0369a1;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        /* Attributes: Ovals (Ellipses) */
+        .attribute {
+            width: 120px;
+            height: 48px;
+            border: 1.5px solid #64748b;
+            border-radius: 50%;
+            background: #ffffff;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        /* Key Attribute: Underlined name */
+        .attribute.pk span {
+            text-decoration: underline;
+            font-weight: 700;
+        }
+
+        /* Derived Attribute: Dashed oval */
+        .attribute.derived {
+            border-style: dashed;
+            color: #475569;
+        }
+
+        /* Labels */
+        .cardinality {
+            position: absolute;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            z-index: 3;
+            background: white;
+            padding: 0 4px;
+        }
+
+        /* Legend */
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 24px 40px;
+            max-width: 1000px;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 12px;
+            gap: 12px;
+            font-size: 13px;
             color: #475569;
         }
 
-        .pk-text {
-            color: #b45309;
-            font-weight: 700;
-        }
-
-        .fk-text {
-            color: #4338ca;
-            font-weight: 700;
-        }
-
-        .one-text {
-            color: #1d4ed8;
-            font-weight: 700;
-        }
-
-        .many-text {
-            color: #7c3aed;
-            font-weight: 700;
+        .leg-shape {
+            flex-shrink: 0;
+            border: 2px solid #64748b;
+            background: #ffffff;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>🎵 Music Flow — ER Diagram</h1>
-    <p class="subtitle">Entity Relationship Diagram · Database: <code>music_flow</code></p>
+    <h1 class="title">Music Flow — ER Diagram</h1>
+    <p class="subtitle">Standard Chen Notation · Database Schema Visualization</p>
 
-    <div class="diagram">
+    <div class="diagram-container">
+        <!-- Lines Layer -->
+        <svg class="svg-lines">
+            <!-- Entities Connector Path -->
+            <line x1="235" y1="375" x2="310" y2="375" />
+            <line x1="400" y1="375" x2="430" y2="375" />
+            <line x1="670" y1="375" x2="710" y2="375" />
+            <line x1="800" y1="375" x2="855" y2="375" />
 
-        <!-- USERS TABLE -->
-        <div class="table-card users">
-            <div class="table-header">users</div>
-            <div class="table-col-labels">
-                <span></span>
-                <span>Column</span>
-                <span>Type</span>
-                <span style="text-align:right">Constraint</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon">🔑</span>
-                <span class="col-name pk">user_id</span>
-                <span class="col-type">INT</span>
-                <span class="col-note">PK · AI</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon"></span>
-                <span class="col-name">username</span>
-                <span class="col-type">VARCHAR(50)</span>
-                <span class="col-note">NOT NULL</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon"></span>
-                <span class="col-name">email</span>
-                <span class="col-type">VARCHAR(100)</span>
-                <span class="col-note">NOT NULL, UQ</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon"></span>
-                <span class="col-name">password</span>
-                <span class="col-type">VARCHAR(100)</span>
-                <span class="col-note">NOT NULL</span>
-            </div>
-        </div>
+            <!-- USERS Attributes -->
+            <line x1="160" y1="375" x2="70" y2="230" />
+            <line x1="160" y1="375" x2="250" y2="230" />
+            <line x1="160" y1="375" x2="70" y2="520" />
+            <line x1="160" y1="375" x2="250" y2="520" />
 
-        <!-- CONNECTOR: users → listening_history -->
-        <div class="rel-wrap">
-            <div class="rel-badge">
-                <div class="rel-title">Listens To</div>
-                <div class="cardinality-row">
-                    <span class="one">1</span>
-                    <svg width="50" height="10" xmlns="http://www.w3.org/2000/svg">
-                        <line x1="5" y1="5" x2="50" y2="5" stroke="#94a3b8" stroke-width="2" />
-                        <polygon points="5,1 0,5 5,9" fill="#94a3b8" />
-                    </svg>
-                    <span class="many">∞</span>
-                </div>
-            </div>
-        </div>
+            <!-- LISTENING_HISTORY Attributes -->
+            <line x1="550" y1="375" x2="460" y2="230" />
+            <line x1="550" y1="375" x2="640" y2="230" />
+            <line x1="550" y1="375" x2="460" y2="520" />
+            <line x1="550" y1="375" x2="640" y2="520" />
 
-        <!-- LISTENING_HISTORY TABLE -->
-        <div class="table-card history">
-            <div class="table-header">listening_history</div>
-            <div class="table-col-labels">
-                <span></span>
-                <span>Column</span>
-                <span>Type</span>
-                <span style="text-align:right">Constraint</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon">🔑</span>
-                <span class="col-name pk">history_id</span>
-                <span class="col-type">INT</span>
-                <span class="col-note">PK · AI</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon">🔗</span>
-                <span class="col-name fk">user_id</span>
-                <span class="col-type">INT</span>
-                <span class="col-note">FK → users</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon">🔗</span>
-                <span class="col-name fk">song_id</span>
-                <span class="col-type">INT</span>
-                <span class="col-note">FK → songs</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon"></span>
-                <span class="col-name">played_at</span>
-                <span class="col-type">TIMESTAMP</span>
-                <span class="col-note">DEFAULT NOW()</span>
-            </div>
-        </div>
+            <!-- SONGS Attributes -->
+            <line x1="930" y1="375" x2="830" y2="230" />
+            <line x1="930" y1="375" x2="930" y2="180" />
+            <line x1="930" y1="375" x2="1030" y2="230" />
+            <line x1="930" y1="375" x2="810" y2="480" />
+            <line x1="930" y1="375" x2="930" y2="570" />
+            <line x1="930" y1="375" x2="1040" y2="540" />
+            <line x1="930" y1="375" x2="1090" y2="440" />
+        </svg>
 
-        <!-- CONNECTOR: listening_history → songs -->
-        <div class="rel-wrap">
-            <div class="rel-badge">
-                <div class="rel-title">Is Played In</div>
-                <div class="cardinality-row">
-                    <span class="many">∞</span>
-                    <svg width="50" height="10" xmlns="http://www.w3.org/2000/svg">
-                        <line x1="0" y1="5" x2="45" y2="5" stroke="#94a3b8" stroke-width="2" />
-                        <polygon points="45,1 50,5 45,9" fill="#94a3b8" />
-                    </svg>
-                    <span class="one">1</span>
-                </div>
-            </div>
-        </div>
+        <!-- Cardinality Labels -->
+        <div class="cardinality" style="left: 245px; top: 355px;">1</div>
+        <div class="cardinality" style="left: 405px; top: 355px;">N</div>
+        <div class="cardinality" style="left: 685px; top: 355px;">N</div>
+        <div class="cardinality" style="left: 845px; top: 355px;">1</div>
 
-        <!-- SONGS TABLE -->
-        <div class="table-card songs">
-            <div class="table-header">songs</div>
-            <div class="table-col-labels">
-                <span></span>
-                <span>Column</span>
-                <span>Type</span>
-                <span style="text-align:right">Constraint</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon">🔑</span>
-                <span class="col-name pk">song_id</span>
-                <span class="col-type">INT</span>
-                <span class="col-note">PK · AI</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon"></span>
-                <span class="col-name">title</span>
-                <span class="col-type">VARCHAR(100)</span>
-                <span class="col-note">NOT NULL</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon"></span>
-                <span class="col-name">artist</span>
-                <span class="col-type">VARCHAR(100)</span>
-                <span class="col-note">NOT NULL</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon"></span>
-                <span class="col-name">genre</span>
-                <span class="col-type">VARCHAR(50)</span>
-                <span class="col-note"></span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon"></span>
-                <span class="col-name">mood</span>
-                <span class="col-type">VARCHAR(50)</span>
-                <span class="col-note"></span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon"></span>
-                <span class="col-name">file_path</span>
-                <span class="col-type">VARCHAR(255)</span>
-                <span class="col-note">NOT NULL</span>
-            </div>
-            <div class="table-row">
-                <span class="row-icon"></span>
-                <span class="col-name">image_url</span>
-                <span class="col-type">VARCHAR(512)</span>
-                <span class="col-note"></span>
-            </div>
-        </div>
+        <!-- USERS ENTITY -->
+        <div class="shape entity" style="left: 85px; top: 340px;">USERS</div>
+        <div class="shape attribute pk" style="left: 10px; top: 200px;"><span>user_id</span></div>
+        <div class="shape attribute" style="left: 190px; top: 200px;">username</div>
+        <div class="shape attribute" style="left: 10px; top: 500px;">email</div>
+        <div class="shape attribute" style="left: 190px; top: 500px;">password</div>
 
+        <!-- RELATIONSHIP: USERS -> HISTORY -->
+        <div class="shape relationship" style="left: 310px; top: 330px;"><span>HAS</span></div>
+
+        <!-- LISTENING_HISTORY ENTITY -->
+        <div class="shape entity" style="left: 430px; top: 340px; width: 240px;">LISTENING_HISTORY</div>
+        <div class="shape attribute pk" style="left: 400px; top: 200px;"><span>history_id</span></div>
+        <div class="shape attribute" style="left: 580px; top: 200px;">played_at</div>
+        <div class="shape attribute" style="left: 400px; top: 500px;">user_id</div>
+        <div class="shape attribute" style="left: 580px; top: 500px;">song_id</div>
+
+        <!-- RELATIONSHIP: HISTORY -> SONGS -->
+        <div class="shape relationship" style="left: 710px; top: 330px;"><span>INCLUDES</span></div>
+
+        <!-- SONGS ENTITY -->
+        <div class="shape entity" style="left: 860px; top: 340px;">SONGS</div>
+        <div class="shape attribute pk" style="left: 770px; top: 200px;"><span>song_id</span></div>
+        <div class="shape attribute" style="left: 870px; top: 150px;">title</div>
+        <div class="shape attribute" style="left: 970px; top: 200px;">artist</div>
+        <div class="shape attribute" style="left: 750px; top: 460px;">genre</div>
+        <div class="shape attribute" style="left: 870px; top: 550px;">mood</div>
+        <div class="shape attribute" style="left: 990px; top: 520px;">file_path</div>
+        <div class="shape attribute" style="left: 1030px; top: 415px;">image_url</div>
     </div>
 
     <!-- Legend -->
     <div class="legend">
-        <div class="legend-item"><span>🔑</span><span class="pk-text">PK</span><span>Primary Key</span></div>
-        <div class="legend-item"><span>🔗</span><span class="fk-text">FK</span><span>Foreign Key</span></div>
-        <div class="legend-item"><span class="one-text">1</span><span>One side</span></div>
-        <div class="legend-item"><span class="many-text">∞</span><span>Many side</span></div>
-        <div class="legend-item"><span style="font-size:10px;color:#64748b">AI</span><span>AUTO_INCREMENT</span></div>
-        <div class="legend-item"><span style="font-size:10px;color:#64748b">UQ</span><span>UNIQUE</span></div>
+        <div class="legend-item">
+            <div class="leg-shape" style="width:36px; height:24px; border-color:#0f172a; background:#f8fafc;"></div>
+            <strong>Strong Entity</strong>
+        </div>
+        <div class="legend-item">
+            <div class="leg-shape"
+                style="width:24px; height:24px; transform:rotate(45deg); border-color:#38bdf8; background:#f0f9ff;">
+            </div>
+            <strong>Relationship</strong>
+        </div>
+        <div class="legend-item">
+            <div class="leg-shape" style="width:36px; height:20px; border-radius:50%;"></div>
+            <strong>Attribute</strong>
+        </div>
+        <div class="legend-item">
+            <div class="leg-shape"
+                style="width:36px; height:20px; border-radius:50%; text-decoration:underline; font-weight:700;"></div>
+            <strong>Primary Key</strong>
+        </div>
+        <div class="legend-item">
+            <div class="leg-shape" style="width:36px; height:20px; border-radius:50%; border-style:dashed;"></div>
+            <strong>Derived Attribute</strong>
+        </div>
+        <div class="legend-item">
+            <span
+                style="font-weight:700; font-size:14px; border:1px solid #94a3b8; padding:2px 6px; border-radius:4px;">1
+                : N</span>
+            <strong>Cardinality</strong>
+        </div>
     </div>
-
 </body>
 
 </html>
