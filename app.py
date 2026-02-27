@@ -1,25 +1,35 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from werkzeug.middleware.proxy_fix import ProxyFix
 import mysql.connector
 import os
+import sys
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Change this for production
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
 
 # --- DATABASE CONNECTION ---
 def get_db_connection():
     try:
+        # Aiven and most clouds require SSL. mysql-connector-python uses ssl_disabled=False by default,
+        # but we'll be explicit to ensure it works.
         conn = mysql.connector.connect(
             host=os.getenv("DB_HOST", "localhost"),
+            port=int(os.getenv("DB_PORT", 3306)),
             user=os.getenv("DB_USER", "root"),
             password=os.getenv("DB_PASSWORD", "bavi1501"),
             database=os.getenv("DB_NAME", "music_flow"),
-            port=int(os.getenv("DB_PORT", 3306)),
-            connect_timeout=10
+            connect_timeout=10,
+            ssl_disabled=False  # Ensure SSL is active for cloud connections
         )
         return conn
-    except Exception as e:
-        print(f"DATABASE CONNECTION ERROR: {e}")
-        raise
+    except mysql.connector.Error as err:
+        print(f"DATABASE CONNECTION ERROR: {err}")
+        return None  # Return None to handle it in routes
+
+@app.errorhandler(500)
+def internal_error(error):
+    return "Internal Server Error: This is likely a database connection issue. Please check Render Environment Variables.", 500
 
 # --- ROUTES ---
 
@@ -34,20 +44,33 @@ def register():
         email = request.form['email']
         password = request.form['password']
         
-        db = get_db_connection()
-        cursor = db.cursor()
-        
-        # Simple SQL query to insert a new user
-        query = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-        cursor.execute(query, (username, email, password))
-        db.commit()
-        
-        cursor.close()
-        db.close()
-        
-        flash("Registration successful! Please login.")
-        return redirect(url_for('login'))
-        
+        try:
+            db = get_db_connection()
+            if not db:
+                flash("Unable to connect to the database. Please check connection settings.")
+                return redirect(url_for('register'))
+            cursor = db.cursor()
+            
+            # Use REPLACE or check if user exists to avoid crash
+            query = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
+            cursor.execute(query, (username, email, password))
+            db.commit()
+            
+            cursor.close()
+            db.close()
+            
+            flash("Registration successful! Please login.")
+            return redirect(url_for('login'))
+        except mysql.connector.Error as err:
+            if err.errno == 1062: # Duplicate entry
+                flash("Email already registered. Try logging in.")
+            else:
+                flash(f"Database error: {err}")
+            return redirect(url_for('register'))
+        except Exception as e:
+            flash(f"An error occurred: {e}")
+            return redirect(url_for('register'))
+            
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -57,6 +80,9 @@ def login():
         password = request.form['password']
         
         db = get_db_connection()
+        if not db:
+            flash("Unable to connect to the database. Please check connection settings.")
+            return redirect(url_for('login'))
         cursor = db.cursor(dictionary=True) # dictionary=True makes results easier to handle
         
         # Check if user exists with matching email and password
@@ -95,6 +121,8 @@ def dashboard():
     selected_mood = request.args.get('mood', 'All')
     
     db = get_db_connection()
+    if not db:
+        return "Database connection error. Please check Render Environment Variables.", 500
     cursor = db.cursor(dictionary=True)
     
     # --- 1. Fetch Music Catalog with Filters ---
@@ -216,6 +244,8 @@ def play_track(song_id):
     user_id = session['user_id']
     
     db = get_db_connection()
+    if not db:
+        return {"status": "error", "message": "Database connection failed"}, 500
     cursor = db.cursor()
     
     # Record that the user played this song
