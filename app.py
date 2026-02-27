@@ -9,10 +9,11 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
 
 # --- DATABASE CONNECTION ---
+last_db_error = "No connection attempted yet."
+
 def get_db_connection():
+    global last_db_error
     try:
-        # Aiven and most clouds require SSL. 
-        # For mysql-connector-python 8.0+, use ssl_mode instead of ssl_disabled.
         conn = mysql.connector.connect(
             host=os.getenv("DB_HOST", "localhost"),
             port=int(os.getenv("DB_PORT", 3306)),
@@ -20,20 +21,21 @@ def get_db_connection():
             password=os.getenv("DB_PASSWORD", "bavi1501"),
             database=os.getenv("DB_NAME", "music_flow"),
             connect_timeout=15,
-            ssl_mode='REQUIRED'  # Force SSL for cloud security
+            ssl_mode='REQUIRED'
         )
         return conn
     except Exception as e:
-        print(f"DATABASE CONNECTION FAIL: {str(e)}")
+        last_db_error = str(e)
+        print(f"DATABASE CONNECTION FAIL: {last_db_error}")
         return None
 
 @app.route('/test-health')
 def health():
-    return "Application is running! If you see this but the site fails, the issue is definitely the database connection."
+    return f"Application is running! Last DB Error: {last_db_error}"
 
 @app.errorhandler(500)
 def internal_error(error):
-    return "Internal Server Error: This usually means the app couldn't connect to your cloud database. Check your Render logs!", 500
+    return f"Internal Server Error (DEBUG): {last_db_error}", 500
 
 # --- ROUTES ---
 
