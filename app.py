@@ -11,25 +11,29 @@ app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
 # --- DATABASE CONNECTION ---
 def get_db_connection():
     try:
-        # Aiven and most clouds require SSL. mysql-connector-python uses ssl_disabled=False by default,
-        # but we'll be explicit to ensure it works.
+        # Aiven and most clouds require SSL. 
+        # For mysql-connector-python 8.0+, use ssl_mode instead of ssl_disabled.
         conn = mysql.connector.connect(
             host=os.getenv("DB_HOST", "localhost"),
             port=int(os.getenv("DB_PORT", 3306)),
             user=os.getenv("DB_USER", "root"),
             password=os.getenv("DB_PASSWORD", "bavi1501"),
             database=os.getenv("DB_NAME", "music_flow"),
-            connect_timeout=10,
-            ssl_disabled=False  # Ensure SSL is active for cloud connections
+            connect_timeout=15,
+            ssl_mode='REQUIRED'  # Force SSL for cloud security
         )
         return conn
-    except mysql.connector.Error as err:
-        print(f"DATABASE CONNECTION ERROR: {err}")
-        return None  # Return None to handle it in routes
+    except Exception as e:
+        print(f"DATABASE CONNECTION FAIL: {str(e)}")
+        return None
+
+@app.route('/test-health')
+def health():
+    return "Application is running! If you see this but the site fails, the issue is definitely the database connection."
 
 @app.errorhandler(500)
 def internal_error(error):
-    return "Internal Server Error: This is likely a database connection issue. Please check Render Environment Variables.", 500
+    return "Internal Server Error: This usually means the app couldn't connect to your cloud database. Check your Render logs!", 500
 
 # --- ROUTES ---
 
