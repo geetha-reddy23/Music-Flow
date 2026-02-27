@@ -979,6 +979,8 @@ nav a:hover {
 }
 
 .auth-form button {
+    position: relative;
+    z-index: 20;
     width: 100%;
     padding: 1rem;
     background: var(--primary);
@@ -995,4 +997,17 @@ nav a:hover {
 .auth-form button:hover {
     transform: translateY(-2px);
     box-shadow: 0 15px 30px rgba(108, 92, 231, 0.4);
+}
+
+/* Flash Messages */
+.flash-message {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
 }
