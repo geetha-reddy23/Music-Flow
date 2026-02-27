@@ -7,12 +7,18 @@ app.secret_key = 'supersecretkey'  # Change this for production
 
 # --- DATABASE CONNECTION ---
 def get_db_connection():
-    return mysql.connector.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        user=os.getenv("DB_USER", "root"),
-        password=os.getenv("DB_PASSWORD", "bavi1501"),
-        database=os.getenv("DB_NAME", "music_flow")
-    )
+    try:
+        conn = mysql.connector.connect(
+            host=os.getenv("DB_HOST", "localhost"),
+            user=os.getenv("DB_USER", "root"),
+            password=os.getenv("DB_PASSWORD", "bavi1501"),
+            database=os.getenv("DB_NAME", "music_flow"),
+            connect_timeout=10
+        )
+        return conn
+    except Exception as e:
+        print(f"DATABASE CONNECTION ERROR: {e}")
+        raise
 
 # --- ROUTES ---
 
