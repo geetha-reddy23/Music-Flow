@@ -70,6 +70,28 @@ python app.py
 ```
 Open your browser and visit: `http://127.0.0.1:5000`
 
+## Deployment (Render + Aiven)
+
+This project is configured for easy deployment on **Render** (Frontend/Backend) and **Aiven** (MySQL Database).
+
+### 1. Database Setup (Aiven)
+1. Sign up for a free MySQL service at [aiven.io](https://aiven.io/).
+2. Copy the connection details (Host, Port, User, Password).
+3. Use the provided `init_remote_db.py` script to initialize your cloud database:
+   - Edit `init_remote_db.py` and enter your Aiven password.
+   - Run `python init_remote_db.py` to upload the schema and songs.
+
+### 2. Live Hosting (Render)
+1. Create a new "Web Service" on **Render** and connect your GitHub repository.
+2. Set the **Start Command** to `gunicorn app:app`.
+3. Add the following **Environment Variables** in the Render Dashboard:
+   - `DB_HOST`: Your Aiven host.
+   - `DB_PORT`: `10192` (or your Aiven port).
+   - `DB_USER`: `avnadmin`.
+   - `DB_PASSWORD`: Your Aiven password.
+   - `DB_NAME`: `defaultdb`.
+   - `SECRET_KEY`: A random string for session security.
+
 ## Features Explained
 - **Midnight Serenity Theme:** A premium, calm, and production-level UI featuring matte slate and navy aesthetics.
 - **Dynamic Background:** High-quality background dots (particles) that move at a lively pace, adding a sense of depth and life.
